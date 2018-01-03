@@ -3,7 +3,7 @@
     <header>
       <span class='itm left' @click='prevMonth'>&lt;</span>
       <span class='itm'>
-        <span>{{ months[month] }} 月</span>&nbsp;&nbsp;
+        <span>{{ months[month] }} {{lang === 'en'? '' : '月'}}</span>&nbsp;&nbsp;
         <span>{{ year }}</span>
       </span>
       <span class='itm right' @click='nextMonth'>&gt;</span>
@@ -23,14 +23,14 @@
 </template>
 
 <script>
-import { daysOfMonth } from '@/utils/common'
+import { daysOfMonth, langPack } from '@/utils/common'
 import moment from 'moment'
 export default {
-  props: ['disabled', 'highlighted'],
+  props: ['disabled', 'highlighted', 'lang'],
   data () {
     return {
-      'weeks': ['日', '一', '二', '三', '四', '五', '六'],
-      'months': ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十', '十一', '十二'],
+      'weeks': [],
+      'months': [],
       today: null,
       year: 0,
       month: 0,
@@ -74,7 +74,6 @@ export default {
         const chosen = this[type]
         if (chosen.from && chosen.to) {
           const from = moment(chosen.from)
-          console.log(from)
           const to = moment(chosen.to)
           if (from - to >= 0) {
             if (now - from >= 0 || now - to <= 0) ret = true
@@ -103,9 +102,14 @@ export default {
       if (this.day) {
         return new Date(this.year, this.month, 1).getDay()
       }
+    },
+    language () {
+      return this.lang ? this.lang : 'cn'
     }
   },
   mounted () {
+    this.weeks = langPack[this.language].weeks
+    this.months = langPack[this.language].months
     const today = new Date()
     this.today = today
     this.year = today.getFullYear()

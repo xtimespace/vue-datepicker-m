@@ -19,6 +19,7 @@
     <div>
       <date-picker
         :disabled='disabled'
+        lang='jp'
         :highlighted='highlighted'>
       </date-picker>
     </div>
@@ -40,8 +41,8 @@ export default {
     return {
       msg: 'Welcome to Your Vue.js App',
       disabled: {
-        from: '2016-03-05',
-        to: '2016-04-04',
+        from: '2018-01-04',
+        to: '2016-10-01',
         dates: ['2016-02-31', '2016-02-39', '2017-12-29', '2017-12-13']
       },
       highlighted: {

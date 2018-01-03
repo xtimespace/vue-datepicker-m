@@ -60,8 +60,23 @@ function daysOfMonth (year, month) {
 
   return ret
 }
+const langPack = {
+  cn: {
+    'weeks': ['日', '一', '二', '三', '四', '五', '六'],
+    'months': ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十', '十一', '十二'],
+  },
+  en: {
+    'weeks': ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+    'months': ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dev'],
+  },
+  jp: {
+    'weeks': ['日', '月', '火', '水', '木', '金', '土'],
+    'months': ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十', '十一', '十二'],
+  }
+}
 
 export {
   isLeapYear,
-  daysOfMonth
+  daysOfMonth,
+  langPack
 }
