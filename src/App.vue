@@ -17,7 +17,10 @@
       <li><a href="https://github.com/vuejs/awesome-vue" target="_blank">awesome-vue</a></li>
     </ul>
     <div>
-      <date-picker></date-picker>
+      <date-picker
+        :disabled='disabled'
+        :highlighted='highlighted'>
+      </date-picker>
     </div>
     <div>
       <h1>Yep, I made it!</h1>
@@ -35,7 +38,17 @@ export default {
   },
   data () {
     return {
-      msg: 'Welcome to Your Vue.js App'
+      msg: 'Welcome to Your Vue.js App',
+      disabled: {
+        from: '2016-03-05',
+        to: '2016-04-04',
+        dates: ['2016-02-31', '2016-02-39', '2017-12-29', '2017-12-13']
+      },
+      highlighted: {
+        from: '2017-12-05',
+        to: '2017-11-24',
+        dates: ['2016-02-31', '2016-02-39', '2017-12-29', '2017-12-13']
+      }
     }
   }
 }

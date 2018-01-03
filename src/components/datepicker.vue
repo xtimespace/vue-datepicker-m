@@ -14,7 +14,9 @@
     <main>
       <span class='day' v-for='itm in beginDay'></span>
       <span class='day' v-for='(itm, index) in days'>
-        <span :class='{"text": true, "hl": isToday(index + 1)}'>{{ isToday(index + 1) ? '今' : index + 1 }}</span>
+        <span :class='{"text": true, "today": isToday(index + 1), "high": isHigh(index + 1), "disabled": isDisabled(index + 1)}'>
+          {{ isToday(index + 1) ? '今' : index + 1 }}
+        </span>
       </span>
     </main>
   </div>
@@ -24,6 +26,7 @@
 import { daysOfMonth } from '@/utils/common'
 import moment from 'moment'
 export default {
+  props: ['disabled', 'highlighted'],
   data () {
     return {
       'weeks': ['日', '一', '二', '三', '四', '五', '六'],
@@ -53,6 +56,40 @@ export default {
         ret = true
       } else {
         ret = false
+      }
+
+      return ret
+    },
+    isHigh (day) {
+      return this.isChosen(day, 'highlighted')
+    },
+    isDisabled (day) {
+      return this.isChosen(day, 'disabled')
+    },
+    isChosen (day, type) {
+      let ret = false
+      const now = moment([this.year, this.month, day])
+
+      if (this[type]) {
+        const chosen = this[type]
+        if (chosen.from && chosen.to) {
+          const from = moment(chosen.from)
+          console.log(from)
+          const to = moment(chosen.to)
+          if (from - to >= 0) {
+            if (now - from >= 0 || now - to <= 0) ret = true
+          } else {
+            if (now - from >= 0 && now - to <= 0) ret = true
+          }
+        }
+        if (!ret && chosen.dates) {
+          for (let i = 0; i < chosen.dates.length; i++) {
+            if (moment(chosen.dates[i]) - now === 0) {
+              ret = true
+              break
+            }
+          }
+        }
       }
 
       return ret
@@ -100,9 +137,6 @@ header {
     flex: 0 0 14.2857%;
     cursor: pointer;
   }
-  .left:active {
-    background: red;
-  }
 
 }
 header, .title, main {
@@ -133,9 +167,20 @@ main .text {
   width: 2.2em;
   height: 2.2em;
   line-height: 2.2em;
+  border-radius: 50%;
 }
-.hl {
+.today {
   background: $dtBg;
   border-radius: 50%;
+}
+.high {
+  color: $hlColor;
+}
+.disabled {
+  color: #555;
+}
+.selected {
+  background: $hlColor;
+  color: white;
 }
 </style>
