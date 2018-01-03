@@ -39,14 +39,18 @@ export default {
   },
   methods: {
     prevMonth () {
-      const mt = moment([this.year, this.month, 1]).subtract(1, 'months')
-      this.month = mt.month()
-      this.year = mt.year()
+      if (this.prevAble) {
+        const mt = moment([this.year, this.month, 1]).subtract(1, 'months')
+        this.month = mt.month()
+        this.year = mt.year()
+      }
     },
     nextMonth () {
-      const mt = moment([this.year, this.month, 1]).add(1, 'months')
-      this.month = mt.month()
-      this.year = mt.year()
+      if (this.nextAble) {
+        const mt = moment([this.year, this.month, 1]).add(1, 'months')
+        this.month = mt.month()
+        this.year = mt.year()
+      }
     },
     isToday (day) {
       let ret
@@ -105,6 +109,42 @@ export default {
     },
     language () {
       return this.lang ? this.lang : 'cn'
+    },
+    nextAble () {
+      let ret = true
+
+      const obj = this.disabled
+      if (obj.from && obj.to) {
+        const from = moment(obj.from)
+        const to = moment(obj.to)
+        const now = moment([this.year, this.month + 1])
+
+        if (to - from < 0) {
+          if (now - from >= 0) {
+            ret = false
+          }
+        }
+      }
+
+      return ret
+    },
+    prevAble () {
+      let ret = true
+
+      const obj = this.disabled
+      if (obj.from && obj.to) {
+        const from = moment(obj.from)
+        const to = moment(obj.to)
+        const now = moment([this.year, this.month])
+
+        if (to - from < 0) {
+          if (now - to <= 0) {
+            ret = false
+          }
+        }
+      }
+
+      return ret
     }
   },
   mounted () {
