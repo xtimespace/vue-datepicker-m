@@ -3,8 +3,8 @@
     <header>
       <span class='itm left' @click='prevMonth'>&lt;</span>
       <span class='itm'>
-        <span>{{ months[month] }} {{lang === 'en'? '' : '月'}}</span>&nbsp;&nbsp;
-        <span>{{ year }}</span>
+        <span class='itm-month'>{{ months[month] }} {{lang === 'en'? '' : '月'}}</span>&nbsp;&nbsp;
+        <span class='itm-year'>{{ year }}</span>
       </span>
       <span class='itm right' @click='nextMonth'>&gt;</span>
     </header>
@@ -15,7 +15,7 @@
       <span class='day' v-for='itm in beginDay'></span>
       <span class='day' v-for='(itm, index) in days'>
         <span :class='{"text": true, "today": isToday(index + 1), "high": isHigh(index + 1), "disabled": isDisabled(index + 1)}'>
-          {{ isToday(index + 1) ? '今' : index + 1 }}
+          {{ isToday(index + 1) ? todayStr : index + 1 }}
         </span>
       </span>
     </main>
@@ -31,6 +31,7 @@ export default {
     return {
       'weeks': [],
       'months': [],
+      todayStr: '',
       today: null,
       year: 0,
       month: 0,
@@ -150,6 +151,7 @@ export default {
   mounted () {
     this.weeks = langPack[this.language].weeks
     this.months = langPack[this.language].months
+    this.todayStr = langPack[this.language].today
     const today = new Date()
     this.today = today
     this.year = today.getFullYear()
@@ -208,9 +210,9 @@ main .day {
 }
 main .text {
   display: inline-block;
-  width: 2.2em;
-  height: 2.2em;
-  line-height: 2.2em;
+  width: 2.8em;
+  height: 2.8em;
+  line-height: 2.8em;
   border-radius: 50%;
 }
 .today {
