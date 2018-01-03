@@ -17,9 +17,11 @@
       <li><a href="https://github.com/vuejs/awesome-vue" target="_blank">awesome-vue</a></li>
     </ul>
     <div>
+      <p>{{ date }}</p>
       <date-picker
         :disabled='disabled'
         lang='jp'
+        @change='changeDate'
         :highlighted='highlighted'>
       </date-picker>
     </div>
@@ -37,8 +39,14 @@ export default {
   components: {
     DatePicker
   },
+  methods: {
+    changeDate (d) {
+      this.date = d
+    }
+  },
   data () {
     return {
+      date: '2018-01-02',
       msg: 'Welcome to Your Vue.js App',
       disabled: {
         from: '2038-03-04',

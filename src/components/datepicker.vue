@@ -58,6 +58,7 @@ export default {
         this.days[this.current.date() - 1].selected = false
         this.current = moment([this.year, this.month, index + 1])
         this.days[index].selected = true
+        this.$emit('change', this.current.format('YYYY-MM-DD'))
       }
     },
     prevMonth () {
