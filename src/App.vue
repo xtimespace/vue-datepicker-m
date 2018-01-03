@@ -16,12 +16,23 @@
       <li><a href="http://vue-loader.vuejs.org/" target="_blank">vue-loader</a></li>
       <li><a href="https://github.com/vuejs/awesome-vue" target="_blank">awesome-vue</a></li>
     </ul>
+    <div>
+      <date-picker></date-picker>
+    </div>
+    <div>
+      <h1>Yep, I made it!</h1>
+      <p>Lorem nam nesciunt quia recusandae soluta. Repudiandae architecto ab perspiciatis distinctio rem? Modi commodi omnis tempora eaque velit. Quaerat similique alias adipisci culpa itaque. Aliquid voluptatem sed aliquid facilis iste!</p>
+    </div>
   </div>
 </template>
 
 <script>
+import DatePicker from '@/components/datepicker'
 export default {
   name: 'app',
+  components: {
+    DatePicker
+  },
   data () {
     return {
       msg: 'Welcome to Your Vue.js App'
