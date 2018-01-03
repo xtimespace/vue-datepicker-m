@@ -13,8 +13,13 @@
     </div>
     <main>
       <span class='day' v-for='itm in beginDay'></span>
-      <span class='day' v-for='(itm, index) in days'>
-        <span :class='{"text": true, "today": isToday(index + 1), "high": isHigh(index + 1), "disabled": isDisabled(index + 1)}'>
+      <span class='day' v-for='(itm, index) in days' :key='index'>
+        <span :class='{"text": true,
+          "today": isToday(index + 1),
+          "high": isHigh(index + 1),
+          "disabled": itm.disabled,
+          "selected": itm.selected}'
+          @click='selectDay(index)'>
           {{ isToday(index + 1) ? todayStr : index + 1 }}
         </span>
       </span>
@@ -26,19 +31,35 @@
 import { daysOfMonth, langPack } from '@/utils/common'
 import moment from 'moment'
 export default {
-  props: ['disabled', 'highlighted', 'lang'],
+  props: ['disabled', 'highlighted', 'lang', 'date'],
   data () {
     return {
-      'weeks': [],
-      'months': [],
+      weeks: [],
+      months: [],
       todayStr: '',
       today: null,
       year: 0,
       month: 0,
-      day: 0
+      current: null,
+      days: []
     }
   },
   methods: {
+    isSelected (day) {
+      const tmp = moment([this.year, this.month, day])
+      if (tmp - this.current === 0) {
+        return true
+      } else {
+        return false
+      }
+    },
+    selectDay (index) {
+      if (this.isHigh(index + 1)) {
+        this.days[this.current.date() - 1].selected = false
+        this.current = moment([this.year, this.month, index + 1])
+        this.days[index].selected = true
+      }
+    },
     prevMonth () {
       if (this.prevAble) {
         const mt = moment([this.year, this.month, 1]).subtract(1, 'months')
@@ -97,14 +118,37 @@ export default {
       }
 
       return ret
+    },
+    refreshDays () {
+      const days = new Array(daysOfMonth(this.year, this.month))
+
+      for (let i = 0; i < days.length; i++) {
+        days[i] = {}
+        if (!this.isHigh(i + 1)) {
+          days[i].disabled = true
+        } else {
+          days[i].disabled = false
+        }
+        if (this.isSelected(i + 1)) {
+          days[i].selected = true
+        } else {
+          days[i].selected = false
+        }
+      }
+      this.days = days
+    }
+  },
+  watch: {
+    year () {
+      this.refreshDays()
+    },
+    month () {
+      this.refreshDays()
     }
   },
   computed: {
-    days () {
-      return daysOfMonth(this.year, this.month)
-    },
     beginDay () {
-      if (this.day) {
+      if (this.year && this.month) {
         return new Date(this.year, this.month, 1).getDay()
       }
     },
@@ -156,7 +200,12 @@ export default {
     this.today = today
     this.year = today.getFullYear()
     this.month = today.getMonth()
-    this.day = today.getDate()
+
+    if (!this.date) {
+      this.current = moment([this.year, this.month, today.getDate()])
+    } else {
+      this.current = moment(this.date)
+    }
   }
 }
 </script>
@@ -223,7 +272,7 @@ main .text {
   color: $hlColor;
 }
 .disabled {
-  color: #555;
+  color: #777;
 }
 .selected {
   background: $hlColor;
