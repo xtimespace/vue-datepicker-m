@@ -11,7 +11,7 @@
     </header>
     <div class="content" v-show='shown.year'>
       <main class="year">
-        <span v-for='itm in years'>
+        <span v-for='itm in years' @click='selectYear(itm)'>
           <span class='text' :class='{
             "selected": itm.selected,
             "disabled": itm.disabled,
@@ -25,7 +25,7 @@
     <!-- It's MONTH -->
     <header v-show='shown.month'>
       <span class='itm left' @click='prevYear'>&lt;</span>
-      <span class='itm'>
+      <span class='itm' @click='toggle("year")'>
         <span class='itm-year'>{{ year }}</span>&nbsp;&nbsp;
       </span>
       <span class='itm right' @click='nextYear'>&gt;</span>
@@ -46,8 +46,8 @@
     <!-- It's DAY -->
     <header v-show='shown.day'>
       <span class='itm left' @click='prevMonth'>&lt;</span>
-      <span class='itm'>
-        <span class='itm-month' @click='toggle("month")'>
+      <span class='itm' @click='toggle("month")'>
+        <span class='itm-month'>
           {{ monthStr }}
         </span>
         &nbsp;&nbsp;
@@ -116,6 +116,10 @@ export default {
         return false
       }
     },
+    selectYear (year) {
+      this.year = year.name
+      this.toggle('month')
+    },
     selectMonth (index) {
       this.month = index
       this.toggle('day')
@@ -155,8 +159,14 @@ export default {
       }
     },
     prevDecade () {
+      if (this.prevDecadeAble) {
+        this.decade -= 10
+      }
     },
     nextDecade () {
+      if (this.nextDecadeAble) {
+        this.decade += 10
+      }
     },
     isToday (day) {
       let ret
@@ -249,7 +259,7 @@ export default {
       }
     },
     refreshYears () {
-      const year = Math.floor(this.year / 10) * 10
+      const year = this.decade
       for (let i = 0; i < this.years.length; i++) {
         this.years[i].name = year + i
       }
@@ -263,6 +273,9 @@ export default {
     month () {
       this.refreshDays()
       this.monthStr = this.months[this.month].name
+    },
+    decade () {
+      this.refreshYears()
     }
   },
   computed: {
@@ -294,6 +307,12 @@ export default {
     },
     language () {
       return this.lang ? this.lang : 'cn'
+    },
+    prevDecadeAble () {
+      return true
+    },
+    nextDecadeAble () {
+      return true
     },
     nextYearAble () {
       let ret = true
@@ -361,6 +380,7 @@ export default {
     this.today = today
     this.year = today.getFullYear()
     this.month = today.getMonth()
+    this.decade = Math.floor(this.year / 10) * 10
 
     if (!this.date) {
       this.current = moment([this.year, this.month, today.getDate()])
@@ -440,7 +460,7 @@ main.month {
 }
 main.year {
   span {
-    flex: 0 0 33.3333%;
+    flex: 0 0 25%;
   }
 }
 .title {
@@ -457,9 +477,9 @@ main .text {
   height: 2.8em;
 }
 main.day .text {
-  width: 2.8em;
-  height: 2.8em;
-  line-height: 2.8em;
+  width: 2.2em;
+  height: 2.2em;
+  line-height: 2.2em;
   border-radius: 50%;
 }
 main.month .text {
