@@ -129,7 +129,7 @@ export default {
         this.days[this.current.date() - 1].selected = false
         this.current = moment([this.year, this.month, index + 1])
         this.days[index].selected = true
-        this.$emit('change', this.current.format('YYYY-MM-DD'))
+        this.$emit('change', this.current._d)
       }
     },
     prevMonth () {
@@ -180,11 +180,28 @@ export default {
 
       return ret
     },
+    isYearHigh (year) {
+      let ret = false
+      let { from, to } = this.fromto.highlighted
+      from = moment([from.year()])
+      to = moment([to.year(), 11])
+      const now = moment([year])
+      if (from - to <= 0) {
+        if (now - from >= 0 && now - to <= 0) {
+          ret = true
+        }
+      } else {
+        if (now - from >= 0 && now - to <= 0) {
+          ret = true
+        }
+      }
+      return ret
+    },
     isMonthHigh (index) {
       let ret = false
       let { from, to } = this.fromto.highlighted
-      from = from.startOf('month')
-      to = to.startOf('month')
+      from = moment([from.year(), from.month()])
+      to = moment([to.year(), to.month()])
       const now = moment([this.year, index])
       if (from - to <= 0) {
         if (now - from >= 0 && now - to <= 0) {
@@ -261,7 +278,13 @@ export default {
     refreshYears () {
       const year = this.decade
       for (let i = 0; i < this.years.length; i++) {
-        this.years[i].name = year + i
+        const itm = this.years[i]
+        itm.name = year + i
+        if (this.isYearHigh(year + i)) {
+          itm.high = true
+        } else {
+          itm.high = false
+        }
       }
     }
   },
@@ -309,10 +332,33 @@ export default {
       return this.lang ? this.lang : 'cn'
     },
     prevDecadeAble () {
-      return true
+      let ret = true
+      let { from, to } = this.fromto.disabled
+
+      if (from && to) {
+        const now = moment([this.decade, 0])
+        if (to - from < 0) {
+          if (now - to <= 0) {
+            ret = false
+          }
+        }
+      }
+
+      return ret
     },
     nextDecadeAble () {
-      return true
+      let ret = true
+      const { from, to } = this.fromto.disabled
+
+      if (from && to) {
+        const now = moment([this.decade, 11])
+        if (to - from < 0) {
+          if (now - from >= 0) {
+            ret = false
+          }
+        }
+      }
+      return ret
     },
     nextYearAble () {
       let ret = true

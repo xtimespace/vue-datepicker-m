@@ -1,15 +1,15 @@
 <template>
   <div id="app">
+    <p>{{ date }}</p>
+    <date-picker
+      :disabled='disabled'
+      lang='jp'
+      @change='changeDate'
+      :highlighted='highlighted'>
+    </date-picker>
     <img src="./assets/logo.png">
     <h1>{{ msg }}</h1>
     <div>
-      <p>{{ date }}</p>
-      <date-picker
-        :disabled='disabled'
-        lang='cn'
-        @change='changeDate'
-        :highlighted='highlighted'>
-      </date-picker>
     </div>
     <div>
       <h1>Yep, I made it!</h1>
@@ -27,7 +27,7 @@ export default {
   },
   methods: {
     changeDate (d) {
-      this.date = d
+      this.date = d.toLocaleTimeString()
     }
   },
   data () {
