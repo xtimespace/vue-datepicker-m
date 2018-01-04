@@ -98,7 +98,8 @@ export default {
       year: 0,
       month: 0,
       current: null,
-      days: []
+      days: [],
+      highMonths: []
     }
   },
   methods: {
@@ -197,6 +198,17 @@ export default {
           }
         }
       }
+      if (!ret) {
+        const arr = this.highDates
+        if (arr) {
+          for (let k in arr) {
+            if (Number(k) === year) {
+              ret = true
+              break
+            }
+          }
+        }
+      }
       return ret
     },
     isMonthHigh (index) {
@@ -213,6 +225,17 @@ export default {
         } else {
           if (now - from >= 0 && now - to <= 0) {
             ret = true
+          }
+        }
+      }
+      if (!ret) {
+        const arr = this.highDates && this.highDates[this.year]
+        if (arr) {
+          for (let k in arr) {
+            if (Number(k) === index + 1) {
+              ret = true
+              break
+            }
           }
         }
       }
@@ -290,6 +313,8 @@ export default {
           itm.high = false
         }
       }
+    },
+    getHighMonths () {
     }
   },
   watch: {
@@ -306,6 +331,26 @@ export default {
     }
   },
   computed: {
+    highDates () {
+      let ret = {}
+      const arr = this.highlighted && this.highlighted.dates
+
+      if (arr && arr instanceof Array && arr.length) {
+        for (let i = 0; i < arr.length; i++) {
+          const year = arr[i].slice(0, 4)
+          const month = arr[i].slice(5, 7)
+          if (!ret[year]) {
+            ret[year] = {}
+          }
+          if (!ret[year][month]) {
+            ret[year][month] = []
+          }
+          ret[year][month].push(arr[i])
+        }
+      }
+
+      return ret
+    },
     fromto () {
       let ret = {
         disabled: { from: null, to: null },
@@ -445,6 +490,8 @@ export default {
     this.year = today.getFullYear()
     this.month = today.getMonth()
     this.decade = Math.floor(this.year / 10) * 10
+
+    console.log(this.highDates)
 
     if (!this.date) {
       this.current = moment([this.year, this.month, today.getDate()])
