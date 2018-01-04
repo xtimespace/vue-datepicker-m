@@ -20,6 +20,7 @@
 
 <script>
 import DatePicker from '@/components/datepicker'
+// import DatePicker from '../dist/index.js'
 export default {
   name: 'app',
   components: {
@@ -40,8 +41,8 @@ export default {
         dates: ['2017-11-08', '2017-11-19', '2017-11-29', '2017-12-03']
       },
       highlighted: {
-        from: '2016-10-05',
-        to: '2016-12-24',
+        froms: '2016-10-05',
+        tos: '2016-12-24',
         dates: ['2016-02-31', '2016-02-19', '2017-12-29', '2017-12-13']
       }
     }

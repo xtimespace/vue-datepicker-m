@@ -1,11 +1,10 @@
 {
   "name": "vue-datepicker-m",
   "description": "A Vue.js project",
-  "main": "src/components/datepicker.vue",
+  "main": "./dist/index.js",
   "version": "1.0.0",
   "author": "spaceman007 <xtimespace@163.com>",
   "license": "MIT",
-  "private": false,
   "scripts": {
     "dev": "cross-env NODE_ENV=development webpack-dev-server --open --hot",
     "build": "cross-env NODE_ENV=production webpack --progress --hide-modules"

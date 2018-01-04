@@ -6,11 +6,16 @@ function resolve (dir) {
 }
 
 module.exports = {
-  entry: './src/main.js',
+  entry: {
+    app: './src/main.js',
+    index: './src/index.js'
+  },
   output: {
     path: path.resolve(__dirname, './dist'),
     publicPath: '/dist/',
-    filename: 'build.js'
+    filename: '[name].js',
+    library: 'DatePicker',
+    libraryTarget: 'umd'
   },
   module: {
     rules: [

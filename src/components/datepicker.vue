@@ -183,16 +183,18 @@ export default {
     isYearHigh (year) {
       let ret = false
       let { from, to } = this.fromto.highlighted
-      from = moment([from.year()])
-      to = moment([to.year(), 11])
-      const now = moment([year])
-      if (from - to <= 0) {
-        if (now - from >= 0 && now - to <= 0) {
-          ret = true
-        }
-      } else {
-        if (now - from >= 0 && now - to <= 0) {
-          ret = true
+      if (from && to) {
+        from = moment([from.year()])
+        to = moment([to.year(), 11])
+        const now = moment([year])
+        if (from - to <= 0) {
+          if (now - from >= 0 && now - to <= 0) {
+            ret = true
+          }
+        } else {
+          if (now - from >= 0 && now - to <= 0) {
+            ret = true
+          }
         }
       }
       return ret
@@ -200,16 +202,18 @@ export default {
     isMonthHigh (index) {
       let ret = false
       let { from, to } = this.fromto.highlighted
-      from = moment([from.year(), from.month()])
-      to = moment([to.year(), to.month()])
-      const now = moment([this.year, index])
-      if (from - to <= 0) {
-        if (now - from >= 0 && now - to <= 0) {
-          ret = true
-        }
-      } else {
-        if (now - from >= 0 && now - to <= 0) {
-          ret = true
+      if (from && to) {
+        from = moment([from.year(), from.month()])
+        to = moment([to.year(), to.month()])
+        const now = moment([this.year, index])
+        if (from - to <= 0) {
+          if (now - from >= 0 && now - to <= 0) {
+            ret = true
+          }
+        } else {
+          if (now - from >= 0 && now - to <= 0) {
+            ret = true
+          }
         }
       }
       return ret
@@ -304,21 +308,35 @@ export default {
   computed: {
     fromto () {
       let ret = {
-        disabled: null, highlighted: null
+        disabled: { from: null, to: null },
+        highlighted: { from: null, to: null }
       }
       const obj = this.disabled
-      if (obj.from && obj.to) {
-        const from = moment(obj.from)
-        const to = moment(obj.to)
-        ret.disabled = { from ,to }
+      if (obj.from) {
+        ret.disabled.from = moment(obj.from)
+      }
+      if (obj.to) {
+        ret.disabled.to = moment(obj.to)
+      }
+      if (!obj.from && obj.to) {
+        obj.from = moment([0])
+      } else if (obj.from && !obj.to) {
+        obj.to = moment([3000])
       }
 
       const hobj = this.highlighted
-      if (hobj.from && hobj.to) {
-        const from = moment(hobj.from)
-        const to = moment(hobj.to)
-        ret.highlighted = { from ,to }
+      if (hobj.from) {
+        ret.highlighted.from = moment(hobj.from)
       }
+      if (hobj.to) {
+        ret.highlighted.to = moment(hobj.to)
+      }
+      if (!hobj.from && hobj.to) {
+        hobj.from = moment([0])
+      } else if (obj.from && !obj.to) {
+        hobj.to = moment([3000])
+      }
+
       return ret
     },
     beginDay () {
@@ -465,10 +483,14 @@ $dtBg: #fcf1eb;
 
 .datepicker {
   position: absolute;
+  right: 0;
+  left: 0;
   background: $bgColor;
   display: flex;
   flex-direction: column;
   box-shadow: 0 0 3px 1px $shadowColor;
+  z-index: 1000;
+  margin: 2.2em 4px 0 4px;
 }
 header {
   display: flex;
