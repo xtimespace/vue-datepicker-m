@@ -3,13 +3,24 @@
 
     <!-- It's YEAR -->
     <header v-show='shown.year'>
-      <span class='itm left' @click='prevMonth'>&lt;</span>
+      <span class='itm left' @click='prevDecade'>&lt;</span>
       <span class='itm'>
-        <span class='itm-year'>{{ year }}</span>
+        <span class='itm-year'>{{ decade }}&apos;</span>
       </span>
-      <span class='itm right' @click='nextMonth'>&gt;</span>
+      <span class='itm right' @click='nextDecade'>&gt;</span>
     </header>
-    <div class="content" v-show='shown.year'></div>
+    <div class="content" v-show='shown.year'>
+      <main class="year">
+        <span v-for='itm in years'>
+          <span class='text' :class='{
+            "selected": itm.selected,
+            "disabled": itm.disabled,
+            "high": itm.high}'>
+            {{ itm.name }}
+          </span>
+        </span>
+      </main>
+    </div>
 
     <!-- It's MONTH -->
     <header v-show='shown.month'>
@@ -21,12 +32,12 @@
     </header>
     <div class="content" v-show='shown.month'>
       <main class="month">
-        <span v-for='itm in months'>
-          <span class='text' :class='{
+        <span v-for='(itm, index) in months'>
+          <span class='text' @click='selectMonth(index)' :class='{
             "selected": itm.selected,
             "disabled": itm.disabled,
             "high": itm.high}'>
-            {{ itm.name }} {{ lang === 'en' ? '' : '月'}}
+            {{ itm.name }}
           </span>
         </span>
       </main>
@@ -36,7 +47,10 @@
     <header v-show='shown.day'>
       <span class='itm left' @click='prevMonth'>&lt;</span>
       <span class='itm'>
-        <span class='itm-month'>{{ months[month] }} {{lang === 'en'? '' : '月'}}</span>&nbsp;&nbsp;
+        <span class='itm-month' @click='toggle("month")'>
+          {{ monthStr }}
+        </span>
+        &nbsp;&nbsp;
         <span class='itm-year'>{{ year }}</span>
       </span>
       <span class='itm right' @click='nextMonth'>&gt;</span>
@@ -71,13 +85,16 @@ export default {
     return {
       shown: {
         year: false,
-        month: true,
-        day: false
+        month: false,
+        day: true
       },
       weeks: [],
       months: [],
+      years: [],
       todayStr: '',
+      monthStr: '',
       today: null,
+      decade: 0,
       year: 0,
       month: 0,
       current: null,
@@ -85,6 +102,12 @@ export default {
     }
   },
   methods: {
+    toggle (type) {
+      for (let k in this.shown) {
+        this.shown[k] = false
+      }
+      this.shown[type] = true
+    },
     isSelected (day) {
       const tmp = moment([this.year, this.month, day])
       if (tmp - this.current === 0) {
@@ -92,6 +115,10 @@ export default {
       } else {
         return false
       }
+    },
+    selectMonth (index) {
+      this.month = index
+      this.toggle('day')
     },
     selectDay (index) {
       if (this.isHigh(index + 1)) {
@@ -126,6 +153,10 @@ export default {
         const mt = moment([this.year, 0]).add(1, 'years')
         this.year = mt.year()
       }
+    },
+    prevDecade () {
+    },
+    nextDecade () {
     },
     isToday (day) {
       let ret
@@ -208,7 +239,6 @@ export default {
       this.days = days
     },
     refreshMonths () {
-      console.log('refresh')
       const ms = this.months
       for (let i = 0; i < ms.length; i++) {
         if (this.isMonthHigh(i)) {
@@ -217,7 +247,12 @@ export default {
           ms[i].high = false
         }
       }
-      console.log(ms)
+    },
+    refreshYears () {
+      const year = Math.floor(this.year / 10) * 10
+      for (let i = 0; i < this.years.length; i++) {
+        this.years[i].name = year + i
+      }
     }
   },
   watch: {
@@ -227,6 +262,7 @@ export default {
     },
     month () {
       this.refreshDays()
+      this.monthStr = this.months[this.month].name
     }
   },
   computed: {
@@ -250,11 +286,11 @@ export default {
       return ret
     },
     beginDay () {
-      if (this.year && this.month) {
-        return new Date(this.year, this.month, 1).getDay()
+      let ret = 0
+      if (this.year) {
+        ret = moment([this.year, this.month]).day()
       }
-    },
-    years () {
+      return ret
     },
     language () {
       return this.lang ? this.lang : 'cn'
@@ -320,16 +356,6 @@ export default {
   },
   mounted () {
     this.weeks = langPack[this.language].weeks
-
-    this.months = langPack[this.language].months.map(d => {
-      return {
-        name: d,
-        disabled: false,
-        selected: false,
-        high: false
-      }
-    })
-
     this.todayStr = langPack[this.language].today
     const today = new Date()
     this.today = today
@@ -340,6 +366,26 @@ export default {
       this.current = moment([this.year, this.month, today.getDate()])
     } else {
       this.current = moment(this.date)
+    }
+
+    this.months = langPack[this.language].months.map(d => {
+      return {
+        name: d,
+        disabled: false,
+        selected: false,
+        high: false
+      }
+    })
+
+    this.monthStr = this.months[this.month].name
+
+    for (let i = 0; i < 10; i++) {
+      this.years[i] = {
+        name: i,
+        disabled: false,
+        selected: false,
+        high: false
+      }
     }
   }
 }
@@ -382,7 +428,7 @@ header, .title, main {
     line-height: 3em;
   }
 }
-main.day {
+main.day, .title {
   span {
     flex: 0 0 14.2857%;
   }
@@ -418,6 +464,7 @@ main.day .text {
 }
 main.month .text {
   width: 4em;
+  cursor: pointer;
 }
 .today {
   background: $dtBg;
@@ -432,5 +479,9 @@ main.month .text {
 .selected {
   background: $hlColor;
   color: white;
+}
+.itm-year,
+.itm-month {
+  cursor: pointer;
 }
 </style>
