@@ -464,6 +464,7 @@ $hlColor: #ff7d31;
 $dtBg: #fcf1eb;
 
 .datepicker {
+  position: absolute;
   background: $bgColor;
   display: flex;
   flex-direction: column;

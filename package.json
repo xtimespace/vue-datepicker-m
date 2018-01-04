@@ -1,8 +1,9 @@
 {
   "name": "vue-datepicker-m",
   "description": "A Vue.js project",
+  "main": "src/components/datepicker.vue",
   "version": "1.0.0",
-  "author": "spaceman007 <skyhe89@outlook.com>",
+  "author": "spaceman007 <xtimespace@163.com>",
   "license": "MIT",
   "private": true,
   "scripts": {

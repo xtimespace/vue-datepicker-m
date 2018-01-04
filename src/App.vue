@@ -3,7 +3,7 @@
     <p>{{ date }}</p>
     <date-picker
       :disabled='disabled'
-      lang='jp'
+      lang='en'
       @change='changeDate'
       :highlighted='highlighted'>
     </date-picker>
