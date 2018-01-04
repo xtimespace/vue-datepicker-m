@@ -1,6 +1,39 @@
 <template>
   <div class='datepicker'>
-    <header>
+
+    <!-- It's YEAR -->
+    <header v-show='shown.year'>
+      <span class='itm left' @click='prevMonth'>&lt;</span>
+      <span class='itm'>
+        <span class='itm-year'>{{ year }}</span>
+      </span>
+      <span class='itm right' @click='nextMonth'>&gt;</span>
+    </header>
+    <div class="content" v-show='shown.year'></div>
+
+    <!-- It's MONTH -->
+    <header v-show='shown.month'>
+      <span class='itm left' @click='prevYear'>&lt;</span>
+      <span class='itm'>
+        <span class='itm-year'>{{ year }}</span>&nbsp;&nbsp;
+      </span>
+      <span class='itm right' @click='nextYear'>&gt;</span>
+    </header>
+    <div class="content" v-show='shown.month'>
+      <main class="month">
+        <span v-for='itm in months'>
+          <span class='text' :class='{
+            "selected": itm.selected,
+            "disabled": itm.disabled,
+            "high": itm.high}'>
+            {{ itm.name }} {{ lang === 'en' ? '' : '月'}}
+          </span>
+        </span>
+      </main>
+    </div>
+
+    <!-- It's DAY -->
+    <header v-show='shown.day'>
       <span class='itm left' @click='prevMonth'>&lt;</span>
       <span class='itm'>
         <span class='itm-month'>{{ months[month] }} {{lang === 'en'? '' : '月'}}</span>&nbsp;&nbsp;
@@ -8,22 +41,24 @@
       </span>
       <span class='itm right' @click='nextMonth'>&gt;</span>
     </header>
-    <div class="title">
-      <span v-for='itm in weeks'>{{ itm }}</span>
-    </div>
-    <main>
-      <span class='day' v-for='itm in beginDay'></span>
-      <span class='day' v-for='(itm, index) in days' :key='index'>
-        <span :class='{"text": true,
-          "today": isToday(index + 1),
-          "high": isHigh(index + 1),
-          "disabled": itm.disabled,
-          "selected": itm.selected}'
-          @click='selectDay(index)'>
-          {{ isToday(index + 1) ? todayStr : index + 1 }}
+    <div class="content" v-show='shown.day'>
+      <div class="title">
+        <span v-for='itm in weeks'>{{ itm }}</span>
+      </div>
+      <main class='day'>
+        <span class='day' v-for='itm in beginDay'></span>
+        <span class='day' v-for='(itm, index) in days' :key='index'>
+          <span :class='{"text": true,
+            "today": isToday(index + 1),
+            "high": isHigh(index + 1),
+            "disabled": itm.disabled,
+            "selected": itm.selected}'
+            @click='selectDay(index)'>
+            {{ isToday(index + 1) ? todayStr : index + 1 }}
+          </span>
         </span>
-      </span>
-    </main>
+      </main>
+    </div>
   </div>
 </template>
 
@@ -34,6 +69,11 @@ export default {
   props: ['disabled', 'highlighted', 'lang', 'date'],
   data () {
     return {
+      shown: {
+        year: false,
+        month: true,
+        day: false
+      },
       weeks: [],
       months: [],
       todayStr: '',
@@ -75,6 +115,18 @@ export default {
         this.year = mt.year()
       }
     },
+    prevYear () {
+      if (this.prevYearAble) {
+        const mt = moment([this.year, 0]).subtract(1, 'years')
+        this.year = mt.year()
+      }
+    },
+    nextYear () {
+      if (this.nextYearAble) {
+        const mt = moment([this.year, 0]).add(1, 'years')
+        this.year = mt.year()
+      }
+    },
     isToday (day) {
       let ret
       if (this.today && day === this.today.getDate() &&
@@ -85,6 +137,23 @@ export default {
         ret = false
       }
 
+      return ret
+    },
+    isMonthHigh (index) {
+      let ret = false
+      let { from, to } = this.fromto.highlighted
+      from = from.startOf('month')
+      to = to.startOf('month')
+      const now = moment([this.year, index])
+      if (from - to <= 0) {
+        if (now - from >= 0 && now - to <= 0) {
+          ret = true
+        }
+      } else {
+        if (now - from >= 0 && now - to <= 0) {
+          ret = true
+        }
+      }
       return ret
     },
     isHigh (day) {
@@ -137,10 +206,23 @@ export default {
         }
       }
       this.days = days
+    },
+    refreshMonths () {
+      console.log('refresh')
+      const ms = this.months
+      for (let i = 0; i < ms.length; i++) {
+        if (this.isMonthHigh(i)) {
+          ms[i].high = true
+        } else {
+          ms[i].high = false
+        }
+      }
+      console.log(ms)
     }
   },
   watch: {
     year () {
+      this.refreshMonths()
       this.refreshDays()
     },
     month () {
@@ -148,25 +230,71 @@ export default {
     }
   },
   computed: {
+    fromto () {
+      let ret = {
+        disabled: null, highlighted: null
+      }
+      const obj = this.disabled
+      if (obj.from && obj.to) {
+        const from = moment(obj.from)
+        const to = moment(obj.to)
+        ret.disabled = { from ,to }
+      }
+
+      const hobj = this.highlighted
+      if (hobj.from && hobj.to) {
+        const from = moment(hobj.from)
+        const to = moment(hobj.to)
+        ret.highlighted = { from ,to }
+      }
+      return ret
+    },
     beginDay () {
       if (this.year && this.month) {
         return new Date(this.year, this.month, 1).getDay()
       }
     },
+    years () {
+    },
     language () {
       return this.lang ? this.lang : 'cn'
     },
-    nextAble () {
+    nextYearAble () {
       let ret = true
+      const { from, to } = this.fromto.disabled
 
-      const obj = this.disabled
-      if (obj.from && obj.to) {
-        const from = moment(obj.from)
-        const to = moment(obj.to)
-        const now = moment([this.year, this.month + 1])
-
+      if (from && to) {
+        const now = moment([this.year, 11])
         if (to - from < 0) {
           if (now - from >= 0) {
+            ret = false
+          }
+        }
+      }
+      return ret
+    },
+    nextAble () {
+      let ret = true
+      const { from, to } = this.fromto.disabled
+
+      if (from && to) {
+        const now = moment([this.year, this.month + 1])
+        if (to - from < 0) {
+          if (now - from >= 0) {
+            ret = false
+          }
+        }
+      }
+      return ret
+    },
+    prevYearAble () {
+      let ret = true
+      let { from, to } = this.fromto.disabled
+
+      if (from && to) {
+        const now = moment([this.year, 0])
+        if (to - from < 0) {
+          if (now - to <= 0) {
             ret = false
           }
         }
@@ -176,13 +304,10 @@ export default {
     },
     prevAble () {
       let ret = true
+      let { from, to } = this.fromto.disabled
 
-      const obj = this.disabled
-      if (obj.from && obj.to) {
-        const from = moment(obj.from)
-        const to = moment(obj.to)
+      if (from && to) {
         const now = moment([this.year, this.month])
-
         if (to - from < 0) {
           if (now - to <= 0) {
             ret = false
@@ -195,7 +320,16 @@ export default {
   },
   mounted () {
     this.weeks = langPack[this.language].weeks
-    this.months = langPack[this.language].months
+
+    this.months = langPack[this.language].months.map(d => {
+      return {
+        name: d,
+        disabled: false,
+        selected: false,
+        high: false
+      }
+    })
+
     this.todayStr = langPack[this.language].today
     const today = new Date()
     this.today = today
@@ -244,9 +378,23 @@ header, .title, main {
   flex-flow: row wrap;
 
   span {
-    flex: 0 0 14.2857%;
     height: 3em;
     line-height: 3em;
+  }
+}
+main.day {
+  span {
+    flex: 0 0 14.2857%;
+  }
+}
+main.month {
+  span {
+    flex: 0 0 25%;
+  }
+}
+main.year {
+  span {
+    flex: 0 0 33.3333%;
   }
 }
 .title {
@@ -255,15 +403,21 @@ header, .title, main {
   height: 3em;
   vertical-align: middle;
 }
-main .day {
+main .day, main .month {
   cursor: pointer;
 }
 main .text {
   display: inline-block;
+  height: 2.8em;
+}
+main.day .text {
   width: 2.8em;
   height: 2.8em;
   line-height: 2.8em;
   border-radius: 50%;
+}
+main.month .text {
+  width: 4em;
 }
 .today {
   background: $dtBg;
