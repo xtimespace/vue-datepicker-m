@@ -1,4 +1,7 @@
 # vue-datepicker-m
+![](./help/imgs/day.png)
+![](./help/imgs/month.png)
+![](./help/imgs/decade.png)
 
 ## Manual
 ### props
@@ -13,6 +16,7 @@
 
 ### events
 - change: pass Date object as params
+- close
 
 ```html
 <date-picker
