@@ -32,10 +32,17 @@ export default {
   },
   methods: {
     changeDate (d) {
-      this.date = d.toLocaleDateString()
+      this.date = this.formattedDate(d)
     },
     close () {
       this.showView = false
+    },
+    formattedDate (d) {
+      const year = d.getFullYear()
+      const month = d.getMonth() + 1
+      const day = d.getDate()
+      const ret = year + '-' + (month > 9 ? month : `0${month}`) + '-' + (day > 9 ? day : `0${day}`)
+      return ret
     }
   },
   data () {

@@ -3,11 +3,11 @@
 
     <!-- It's YEAR -->
     <header v-show='shown.year'>
-      <span class='itm left' @click='prevDecade'>&lt;</span>
+      <span class='itm left' :class='{"invalid": !prevDecadeAble}' @click='prevDecade'>&lt;</span>
       <span class='itm'>
         <span class='itm-year'>{{ decade }}&apos;s</span>
       </span>
-      <span class='itm right' @click='nextDecade'>&gt;</span>
+      <span class='itm right' :class='{"invalid": !nextDecadeAble}' @click='nextDecade'>&gt;</span>
     </header>
     <div class="content" v-show='shown.year'>
       <main class="year">
@@ -24,11 +24,11 @@
 
     <!-- It's MONTH -->
     <header v-show='shown.month'>
-      <span class='itm left' @click='prevYear'>&lt;</span>
+      <span class='itm left' :class='{"invalid": !prevYearAble}' @click='prevYear'>&lt;</span>
       <span class='itm' @click='toggle("year")'>
         <span class='itm-year'>{{ year }}</span>&nbsp;&nbsp;
       </span>
-      <span class='itm right' @click='nextYear'>&gt;</span>
+      <span class='itm right' :class='{"invalid": !nextYearAble}' @click='nextYear'>&gt;</span>
     </header>
     <div class="content" v-show='shown.month'>
       <main class="month">
@@ -45,7 +45,7 @@
 
     <!-- It's DAY -->
     <header v-show='shown.day'>
-      <span class='itm left' @click='prevMonth'>&lt;</span>
+      <span class='itm left' :class='{"invalid": !prevAble}' @click='prevMonth'>&lt;</span>
       <span class='itm' @click='toggle("month")'>
         <span class='itm-month'>
           {{ monthStr }}
@@ -53,7 +53,7 @@
         &nbsp;&nbsp;
         <span class='itm-year'>{{ year }}</span>
       </span>
-      <span class='itm right' @click='nextMonth'>&gt;</span>
+      <span class='itm right' :class='{"invalid": !nextAble}' @click='nextMonth'>&gt;</span>
     </header>
     <div class="content" v-show='shown.day'>
       <div class="title">
@@ -363,7 +363,9 @@ export default {
     },
     month () {
       this.refreshDays()
-      this.monthStr = this.months[this.month].name
+      if (this.month >= 0 && this.month < 12) {
+        this.monthStr = this.months[this.month].name
+      }
     },
     decade () {
       this.refreshYears()
@@ -382,9 +384,11 @@ export default {
       }
     },
     date () {
-      this.year = this.date.slice(0, 4)
-      this.month = this.date.slice(5, 7) - 1
-      this.current = moment(this.date)
+      if (/^\d{4}-\d{2}-\d{2}/.test(this.date)) {
+        this.year = this.date.slice(0, 4)
+        this.month = this.date.slice(5, 7) - 1
+        this.current = moment(this.date)
+      }
     }
   },
   computed: {
@@ -455,7 +459,7 @@ export default {
       const { from, to } = this.fromto.disabled
 
       if (from && to) {
-        const now = moment([this.decade, 11])
+        const now = moment([this.decade + 10, 11])
         if (to - from < 0) {
           if (now - from >= 0) {
             ret = false
@@ -526,6 +530,14 @@ export default {
   mounted () {
     this.weeks = langPack[this.language].weeks
     this.todayStr = langPack[this.language].today
+    this.months = langPack[this.language].months.map(d => {
+      return {
+        name: d,
+        disabled: false,
+        selected: false,
+        high: false
+      }
+    })
 
     const today = new Date()
     this.today = today
@@ -547,14 +559,6 @@ export default {
       this.addOutsideClickListener()
     }
 
-    this.months = langPack[this.language].months.map(d => {
-      return {
-        name: d,
-        disabled: false,
-        selected: false,
-        high: false
-      }
-    })
 
     this.monthStr = this.months[this.month].name
   }
@@ -670,5 +674,8 @@ main.year .text {
 .itm-year,
 .itm-month {
   cursor: pointer;
+}
+.invalid {
+  color: #aaa;
 }
 </style>
