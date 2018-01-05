@@ -11,13 +11,13 @@
       :highlighted='highlighted'>
     </date-picker>
     <!-- <date-picker lang='jp' @change='changeDate'></date-picker> -->
-    <img src="./assets/logo.png">
     <h1>{{ msg }}</h1>
     <div>
     </div>
     <div>
-      <h1>Yep, I made it!</h1>
-      <p>Lorem nam nesciunt quia recusandae soluta. Repudiandae architecto ab perspiciatis distinctio rem? Modi commodi omnis tempora eaque velit. Quaerat similique alias adipisci culpa itaque. Aliquid voluptatem sed aliquid facilis iste!</p>
+      <h1>Wonderful Vue2 datepicker</h1>
+      <h3>No input at all, just enjoy it!</h3>
+      <p>Thank you!</p>
     </div>
   </div>
 </template>
@@ -49,7 +49,7 @@ export default {
     return {
       date: '2017-11-03',
       showView: false,
-      msg: 'Welcome to Your Vue.js App',
+      msg: 'Welcome to The Vue2 datepicker, which works fine on mobile phones! ',
       disabled: {
         from: '2038-03-04',
         to: '1016-12-09',
