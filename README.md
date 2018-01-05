@@ -7,13 +7,22 @@
 - date
 - lang, support 'en' - english, 'cn' - chinese, 'jp' - japanese
 
+**attentions**:
+- date format in highlighted and disabled must be as 'yyyy-MM-dd', for example, '2018-01-01'
+- date must be as 'yyyy-MM-dd'
+
 ### events
 - change: pass Date object as params
 
 ```html
-<date-picker lang='en'
+<date-picker
+  lang='en'
+  date='2018-01-01'
+  :showView='showView'
   :disabled='disabled'
-  :highlighted>
+  :highlighted
+  @close='close'
+  @change='changeDate'>
 </date-picker>
 ```
 
@@ -24,6 +33,7 @@ components: {
 },
 data () {
   return {
+    showView: true,
     disabled: {
       from: '2018-03-03',
       to: '1990-01-01'
@@ -33,6 +43,14 @@ data () {
       to: '2017-10-25',
       date: ['2017-12-11', '2017-12-14', '2017-12-19']
     }
+  }
+}
+methods: {
+  close () {
+    this.showView = false
+  },
+  changeDate (d) {
+    // d is a Date object
   }
 }
 ```
