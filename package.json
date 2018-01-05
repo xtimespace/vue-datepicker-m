@@ -2,7 +2,7 @@
   "name": "vue-datepicker-m",
   "description": "A Vue.js project",
   "main": "./dist/index.js",
-  "version": "1.0.3",
+  "version": "1.0.5",
   "author": "spaceman007 <xtimespace@163.com>",
   "repository": {
     "type": "git",
@@ -16,6 +16,7 @@
   "bugs": {
     "url": "https://github.com/xtimespace/vue-datepicker-m/issues"
   },
+  "homepage": "https://xtimespace.github.io/vue-datepicker-m/",
   "license": "MIT",
   "scripts": {
     "dev": "cross-env NODE_ENV=development webpack-dev-server --open --hot",
