@@ -357,29 +357,33 @@ export default {
         highlighted: { from: null, to: null }
       }
       const obj = this.disabled
-      if (obj.from) {
-        ret.disabled.from = moment(obj.from)
-      }
-      if (obj.to) {
-        ret.disabled.to = moment(obj.to)
-      }
-      if (!obj.from && obj.to) {
-        obj.from = moment([0])
-      } else if (obj.from && !obj.to) {
-        obj.to = moment([3000])
+      if (obj) {
+        if (obj.from) {
+          ret.disabled.from = moment(obj.from)
+        }
+        if (obj.to) {
+          ret.disabled.to = moment(obj.to)
+        }
+        if (!obj.from && obj.to) {
+          obj.from = moment([0])
+        } else if (obj.from && !obj.to) {
+          obj.to = moment([3000])
+        }
       }
 
       const hobj = this.highlighted
-      if (hobj.from) {
-        ret.highlighted.from = moment(hobj.from)
-      }
-      if (hobj.to) {
-        ret.highlighted.to = moment(hobj.to)
-      }
-      if (!hobj.from && hobj.to) {
-        hobj.from = moment([0])
-      } else if (obj.from && !obj.to) {
-        hobj.to = moment([3000])
+      if (hobj) {
+        if (hobj.from) {
+          ret.highlighted.from = moment(hobj.from)
+        }
+        if (hobj.to) {
+          ret.highlighted.to = moment(hobj.to)
+        }
+        if (!hobj.from && hobj.to) {
+          hobj.from = moment([0])
+        } else if (obj.from && !obj.to) {
+          hobj.to = moment([3000])
+        }
       }
 
       return ret
@@ -491,8 +495,6 @@ export default {
     this.month = today.getMonth()
     this.decade = Math.floor(this.year / 10) * 10
 
-    console.log(this.highDates)
-
     if (!this.date) {
       this.current = moment([this.year, this.month, today.getDate()])
     } else {
@@ -598,7 +600,8 @@ main.day .text {
   line-height: 2.2em;
   border-radius: 50%;
 }
-main.month .text {
+main.month .text,
+main.year .text {
   width: 4em;
   cursor: pointer;
 }
