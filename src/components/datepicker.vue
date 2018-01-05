@@ -1,5 +1,5 @@
 <template>
-  <div class='datepicker'>
+  <div class='datepicker' v-show='showView'>
 
     <!-- It's YEAR -->
     <header v-show='shown.year'>
@@ -80,7 +80,7 @@
 import { daysOfMonth, langPack } from '@/utils/common'
 import moment from 'moment'
 export default {
-  props: ['disabled', 'highlighted', 'lang', 'date'],
+  props: ['disabled', 'highlighted', 'lang', 'date', 'showView'],
   data () {
     return {
       shown: {
@@ -103,6 +103,21 @@ export default {
     }
   },
   methods: {
+    close () {
+      this.$emit('close')
+    },
+    clickOutside (ev) {
+      if (this.$el && !this.$el.contains(ev.target)) {
+        this.close()
+      }
+    },
+    addOutsideClickListener () {
+      if (!this.isInline) {
+        setTimeout(() => {
+          document.addEventListener('click', this.clickOutside, false)
+        }, 100)
+      }
+    },
     getHighlightedDates () {
       let ret = {}
       const arr = this.highlighted && this.highlighted.dates
@@ -323,7 +338,14 @@ export default {
     },
     refreshYears () {
       const year = this.decade
-      for (let i = 0; i < this.years.length; i++) {
+      for (let i = 0; i < 10; i++) {
+        if (!this.years[i]) {
+          this.years[i] = {
+            disabled: false,
+            selected: false,
+            high: false
+          }
+        }
         const itm = this.years[i]
         itm.name = year + i
         if (this.isYearHigh(year + i)) {
@@ -348,6 +370,21 @@ export default {
     },
     highlighted () {
       this.getHighlightedDates()
+      this.refreshYears()
+      this.refreshMonths()
+      this.refreshDays()
+    },
+    showView () {
+      if (this.showView) {
+        this.addOutsideClickListener()
+      } else {
+        document.removeEventListener('click', this.clickOutside, false)
+      }
+    },
+    date () {
+      this.year = this.date.slice(0, 4)
+      this.month = this.date.slice(5, 7) - 1
+      this.current = moment(this.date)
     }
   },
   computed: {
@@ -489,18 +526,25 @@ export default {
   mounted () {
     this.weeks = langPack[this.language].weeks
     this.todayStr = langPack[this.language].today
+
     const today = new Date()
     this.today = today
-    this.year = today.getFullYear()
-    this.month = today.getMonth()
+
+    if (this.date) {
+      this.year = this.date.slice(0, 4)
+      this.month = this.date.slice(5, 7) - 1
+      this.current = moment(this.date)
+    } else {
+      this.year = today.getFullYear()
+      this.month = today.getMonth()
+      this.current = moment([this.year, this.month, today.getDate()])
+    }
     this.decade = Math.floor(this.year / 10) * 10
 
     this.getHighlightedDates()
 
-    if (!this.date) {
-      this.current = moment([this.year, this.month, today.getDate()])
-    } else {
-      this.current = moment(this.date)
+    if (this.showView) {
+      this.addOutsideClickListener()
     }
 
     this.months = langPack[this.language].months.map(d => {
@@ -513,15 +557,6 @@ export default {
     })
 
     this.monthStr = this.months[this.month].name
-
-    for (let i = 0; i < 10; i++) {
-      this.years[i] = {
-        name: i,
-        disabled: false,
-        selected: false,
-        high: false
-      }
-    }
   }
 }
 </script>
@@ -543,18 +578,25 @@ $dtBg: #fcf1eb;
   flex-direction: column;
   box-shadow: 0 0 3px 1px $shadowColor;
   z-index: 1000;
-  margin: 2.2em 4px 0 4px;
+  margin: 1em 4px 0 4px;
 }
 header {
-  display: flex;
+  height: 2em;
   margin-top: 1em;
+  display: flex;
+  align-items: center;
   justify-content: space-between;
   font-weight: bold;
+
+  .itm {
+    line-height: 2em;
+  }
 
   .left, .right {
     flex: 0 0 14.2857%;
     cursor: pointer;
     text-align: center;
+    font-size: 1.2em;
   }
 }
 header, .title, main {
@@ -586,7 +628,6 @@ main.year {
   }
 }
 .title {
-  margin-top: 2em;
   background: $dtBg;
   height: 3em;
   vertical-align: middle;

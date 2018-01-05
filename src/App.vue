@@ -1,12 +1,16 @@
 <template>
   <div id="app">
-    <p>{{ date }}</p>
+    <p @click='showView=!showView'>{{ date }}</p>
     <date-picker
       :disabled='disabled'
       lang='en'
+      :date='date'
+      :showView=showView
+      @close='close'
       @change='changeDate'
       :highlighted='highlighted'>
     </date-picker>
+    <!-- <date-picker lang='jp' @change='changeDate'></date-picker> -->
     <img src="./assets/logo.png">
     <h1>{{ msg }}</h1>
     <div>
@@ -28,12 +32,16 @@ export default {
   },
   methods: {
     changeDate (d) {
-      this.date = d.toLocaleTimeString()
+      this.date = d.toLocaleDateString()
+    },
+    close () {
+      this.showView = false
     }
   },
   data () {
     return {
-      date: '2018-01-02',
+      date: '2017-11-03',
+      showView: false,
       msg: 'Welcome to Your Vue.js App',
       disabled: {
         from: '2038-03-04',
@@ -41,9 +49,11 @@ export default {
         dates: ['2017-11-08', '2017-11-19', '2017-11-29', '2017-12-03']
       },
       highlighted: {
-        froms: '2016-10-05',
-        tos: '2016-12-24',
-        dates: ['2016-02-31', '2016-03-19', '2017-12-29', '2017-12-13']
+        // from: '2016-10-05',
+        // to: '2016-12-24',
+        from: null,
+        to: null,
+        dates: ['2017-12-03', '2017-11-04', '2017-12-12', '2017-12-13', '2018-01-02']
       }
     }
   }
