@@ -531,6 +531,8 @@ $hlColor: #ff7d31;
 $dtBg: #fcf1eb;
 
 .datepicker {
+  color: #2c3e50;
+  text-align: center;
   position: absolute;
   right: 0;
   left: 0;
@@ -550,8 +552,8 @@ header {
   .left, .right {
     flex: 0 0 14.2857%;
     cursor: pointer;
+    text-align: center;
   }
-
 }
 header, .title, main {
   padding: 0 1em;
@@ -589,6 +591,9 @@ main.year {
 }
 main .day, main .month {
   cursor: pointer;
+}
+main span {
+  text-align: center;
 }
 main .text {
   display: inline-block;
