@@ -5,7 +5,7 @@
     <header v-show='shown.year'>
       <span class='itm left' @click='prevDecade'>&lt;</span>
       <span class='itm'>
-        <span class='itm-year'>{{ decade }}&apos;</span>
+        <span class='itm-year'>{{ decade }}&apos;s</span>
       </span>
       <span class='itm right' @click='nextDecade'>&gt;</span>
     </header>
@@ -99,10 +99,29 @@ export default {
       month: 0,
       current: null,
       days: [],
-      highMonths: []
+      highDates: {}
     }
   },
   methods: {
+    getHighlightedDates () {
+      let ret = {}
+      const arr = this.highlighted && this.highlighted.dates
+
+      if (arr && arr instanceof Array && arr.length) {
+        for (let i = 0; i < arr.length; i++) {
+          const year = arr[i].slice(0, 4)
+          const month = arr[i].slice(5, 7)
+          if (!ret[year]) {
+            ret[year] = {}
+          }
+          if (!ret[year][month]) {
+            ret[year][month] = []
+          }
+          ret[year][month].push(arr[i])
+        }
+      }
+      this.highDates = ret
+    },
     toggle (type) {
       for (let k in this.shown) {
         this.shown[k] = false
@@ -313,8 +332,6 @@ export default {
           itm.high = false
         }
       }
-    },
-    getHighMonths () {
     }
   },
   watch: {
@@ -328,29 +345,12 @@ export default {
     },
     decade () {
       this.refreshYears()
+    },
+    highlighted () {
+      this.getHighlightedDates()
     }
   },
   computed: {
-    highDates () {
-      let ret = {}
-      const arr = this.highlighted && this.highlighted.dates
-
-      if (arr && arr instanceof Array && arr.length) {
-        for (let i = 0; i < arr.length; i++) {
-          const year = arr[i].slice(0, 4)
-          const month = arr[i].slice(5, 7)
-          if (!ret[year]) {
-            ret[year] = {}
-          }
-          if (!ret[year][month]) {
-            ret[year][month] = []
-          }
-          ret[year][month].push(arr[i])
-        }
-      }
-
-      return ret
-    },
     fromto () {
       let ret = {
         disabled: { from: null, to: null },
@@ -494,6 +494,8 @@ export default {
     this.year = today.getFullYear()
     this.month = today.getMonth()
     this.decade = Math.floor(this.year / 10) * 10
+
+    this.getHighlightedDates()
 
     if (!this.date) {
       this.current = moment([this.year, this.month, today.getDate()])
